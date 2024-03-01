@@ -113,19 +113,25 @@ pushd "$ICU4C_SOURCE_DIR"
         ;;
         linux*)
             pushd "source"
-                ## export CC="gcc-4.1"
-                ## export CXX="g++-4.1"
-                export CXXFLAGS="-m$AUTOBUILD_ADDRSIZE $LL_BUILD_RELEASE"
-                export CFLAGS="$(remove_cxxstd $CXXFLAGS)"
+                # Default target per autobuild build --address-size
+                opts="${TARGET_OPTS:--m$AUTOBUILD_ADDRSIZE}"
+                DEBUG_COMMON_FLAGS="$opts -Og -g -fPIC -DPIC"
+                RELEASE_COMMON_FLAGS="$opts -O3 -g -fPIC -DPIC -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+                DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
+                RELEASE_CFLAGS="$RELEASE_COMMON_FLAGS"
+                DEBUG_CXXFLAGS="$DEBUG_COMMON_FLAGS -std=c++17"
+                RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
+                DEBUG_CPPFLAGS="-DPIC"
+                RELEASE_CPPFLAGS="-DPIC"
                 export common_options="--prefix=${stage} --enable-shared=no \
                     --enable-static=yes --disable-dyload --enable-extras=no \
                     --enable-samples=no --enable-tests=no --enable-layout=no"
                 mkdir -p $stage
                 chmod +x runConfigureICU configure install-sh
                 # HACK: Break format layout so boost can find the library.
-                ./runConfigureICU Linux $common_options --libdir=${stage}/lib/
+                ./runConfigureICU Linux $common_options --libdir=${stage}/lib/release
 
-                make -j$(nproc)
+                make -j$AUTOBUILD_CPU_COUNT
                 make install
             popd
 
