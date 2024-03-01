@@ -82,12 +82,29 @@ pushd "$ICU4C_SOURCE_DIR"
         ;;
         darwin*)
             pushd "source"
+                # Setup osx sdk platform
+                SDKNAME="macosx"
+                export SDKROOT=$(xcodebuild -version -sdk ${SDKNAME} Path)
 
-                opts="-arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD_RELEASE -DU_CHARSET_IS_UTF8=1"
-                plainopts="$(remove_cxxstd $opts)"
-                export CFLAGS="$plainopts"
-                export CXXFLAGS="$opts"
-                export LDFLAGS="$plainopts"
+                # Setup build flags
+                ARCH_FLAGS_X86="-arch x86_64 -mmacosx-version-min=10.15 -isysroot ${SDKROOT} -msse4.2"
+                ARCH_FLAGS_ARM64="-arch arm64 -mmacosx-version-min=11.0 -isysroot ${SDKROOT}"
+                DEBUG_COMMON_FLAGS="-O0 -g -fPIC -DPIC"
+                RELEASE_COMMON_FLAGS="-O3 -g -fPIC -DPIC -fstack-protector-strong"
+                DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
+                RELEASE_CFLAGS="$RELEASE_COMMON_FLAGS"
+                DEBUG_CXXFLAGS="$DEBUG_COMMON_FLAGS -std=c++17"
+                RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
+                DEBUG_CPPFLAGS="-DPIC"
+                RELEASE_CPPFLAGS="-DPIC"
+                DEBUG_LDFLAGS="-Wl,-headerpad_max_install_names"
+                RELEASE_LDFLAGS="-Wl,-headerpad_max_install_names"
+
+                # x86 deploy target
+                export MACOSX_DEPLOYMENT_TARGET=10.15
+
+                export CXXFLAGS="$RELEASE_CXXFLAGS"
+                export CFLAGS="$RELEASE_CFLAGS"
                 export common_options="--prefix=${stage} --enable-shared=no \
                     --enable-static=yes --disable-dyload --enable-extras=no \
                     --enable-samples=no --enable-tests=no --enable-layout=no"
@@ -123,6 +140,9 @@ pushd "$ICU4C_SOURCE_DIR"
                 RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
                 DEBUG_CPPFLAGS="-DPIC"
                 RELEASE_CPPFLAGS="-DPIC"
+
+                export CXXFLAGS="$RELEASE_CXXFLAGS"
+                export CFLAGS="$RELEASE_CFLAGS"
                 export common_options="--prefix=${stage} --enable-shared=no \
                     --enable-static=yes --disable-dyload --enable-extras=no \
                     --enable-samples=no --enable-tests=no --enable-layout=no"
