@@ -302,7 +302,7 @@ $(TOOLS_TS): "$(ICUTOOLS)\genrb\$(CFGTOOLS)\genrb.exe" "$(ICUTOOLS)\gencnval\$(C
 $(COREDATA_TS):
 	@cd "$(ICUSRCDATA)"
 	set PYTHONPATH=$(ICUP)\source\python;%PYTHONPATH%
-	py -3 -B -m icutools.databuilder \
+	python -B -m icutools.databuilder \
 		--mode windows-exec \
 		--src_dir "$(ICUSRCDATA)" \
 		--tool_dir "$(ICUTOOLS)" \
