@@ -113,7 +113,7 @@ pushd "$ICU4C_SOURCE_DIR"
                 # HACK: Break format layout so boost can find the library.
                 ./runConfigureICU MacOSX $common_options --libdir=${stage}/lib/
 
-                make -j$(nproc)
+                make -j$AUTOBUILD_CPU_COUNT
                 make install
             popd
 
