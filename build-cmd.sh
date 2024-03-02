@@ -103,8 +103,8 @@ pushd "$ICU4C_SOURCE_DIR"
                 # x86 deploy target
                 export MACOSX_DEPLOYMENT_TARGET=10.15
 
-                export CXXFLAGS="$RELEASE_CXXFLAGS"
-                export CFLAGS="$RELEASE_CFLAGS"
+                export CXXFLAGS="$ARCH_FLAGS_X86 $RELEASE_CXXFLAGS"
+                export CFLAGS="$ARCH_FLAGS_X86 $RELEASE_CFLAGS"
                 export common_options="--prefix=${stage} --enable-shared=no \
                     --enable-static=yes --disable-dyload --enable-extras=no \
                     --enable-samples=no --enable-tests=no --enable-layout=no"
